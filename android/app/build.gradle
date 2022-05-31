@@ -13,12 +13,10 @@ android {
             ndkBuild {
                 cppFlags "-std=c++17"
             }
-
         }
         ndk {
             abiFilters 'armeabi-v7a'
         }
-
     }
     buildTypes {
         release {
