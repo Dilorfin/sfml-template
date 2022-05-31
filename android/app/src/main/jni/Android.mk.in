@@ -2,6 +2,13 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
+LOCAL_MODULE := native-lib-test
+LOCAL_SRC_FILES := @@
+
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+
 LOCAL_MODULE	:= sfml-example
 
 LOCAL_SHARED_LIBRARIES := native-lib-test
@@ -17,6 +24,5 @@ LOCAL_WHOLE_STATIC_LIBRARIES := sfml-main-d
 
 include $(BUILD_SHARED_LIBRARY)
 
-$(call import-module,third_party/native-lib-test)
 $(call import-module,third_party/box2d)
 $(call import-module,third_party/sfml)
