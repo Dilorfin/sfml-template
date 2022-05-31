@@ -1,0 +1,25 @@
+From e18253cf8a3b70c7d4ab061b33b804fb1150e889 Mon Sep 17 00:00:00 2001
+From: Dilorfin <pavlo_kuibida@epam.com>
+Date: Tue, 31 May 2022 20:09:19 +0300
+Subject: [PATCH] Fix ANativeActivity_onCreate
+
+---
+ src/SFML/Main/SFMLActivity.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/SFML/Main/SFMLActivity.cpp b/src/SFML/Main/SFMLActivity.cpp
+index 8e0fabf8..7b75f261 100644
+--- a/src/SFML/Main/SFMLActivity.cpp
++++ b/src/SFML/Main/SFMLActivity.cpp
+@@ -125,7 +125,7 @@ void* loadLibrary(const char* libraryName, JNIEnv* lJNIEnv, jobject& ObjectActiv
+     return handle;
+ }
+ 
+-void ANativeActivity_onCreate(ANativeActivity* activity, void* savedState, size_t savedStateSize)
++JNIEXPORT void ANativeActivity_onCreate(ANativeActivity* activity, void* savedState, size_t savedStateSize)
+ {
+     // Before we can load a library, we need to find out its location. As
+     // we're powerless here in C/C++, we need the JNI interface to communicate
+-- 
+2.31.1.windows.1
+

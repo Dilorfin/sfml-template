@@ -4,18 +4,16 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "org.sfmldev.android"
-        minSdkVersion 29
+        minSdkVersion 20
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
         externalNativeBuild {
-            cmake {
-                cppFlags "-std=c++17 -fexceptions -frtti"
-                arguments '-DANDROID_STL=c++_shared'
-                //arguments '-DANDROID_PLATFORM=android-14', '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=stlport_shared'
-                //abiFilters ''
+            ndkBuild {
+                cppFlags "-std=c++17"
             }
+
         }
         ndk {
             abiFilters 'armeabi-v7a'
@@ -29,8 +27,8 @@ android {
         }
     }
     externalNativeBuild {
-        cmake {
-            path '../../CMakeLists.txt'
+        ndkBuild {
+            path "src/main/jni/Android.mk"
         }
     }
 }
