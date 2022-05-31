@@ -2,7 +2,7 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE    := sfml-example
+LOCAL_MODULE	:= sfml-example
 
 LOCAL_SHARED_LIBRARIES := native-lib-test
 LOCAL_SHARED_LIBRARIES += sfml-system-d

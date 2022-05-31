@@ -13,6 +13,9 @@ if(CMAKE_CONFIGURATION_TYPES)
 	set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Reset the configurations to what we need" FORCE)	
 endif(CMAKE_CONFIGURATION_TYPES)
 
+option(SFML_ANDROID_PATH "Path to prebuild SFML binaries for Android")
+option(BOX2D_ANDROID_PATH "Path to prebuild box2d binaries for Android")
+
 if(NOT DEFINED CMAKE_ANDROID_NDK)
 	if(DEFINED ENV{ANDROID_NDK_HOME})
 		set(CMAKE_ANDROID_NDK $ENV{ANDROID_NDK_ROOT})
@@ -35,9 +38,15 @@ endif()
 
 cmake_path(APPEND CMAKE_ANDROID_NDK "sources" "third_party" OUTPUT_VARIABLE ANDROID_NDK_THIRD_PARTY)
 
+cmake_path(APPEND ANDROID_NDK_THIRD_PARTY "box2d" "lib" ${CMAKE_ANDROID_ARCH_ABI} OUTPUT_VARIABLE BOX2D_LIB_DIR)
+cmake_path(APPEND ANDROID_NDK_THIRD_PARTY "box2d" "include" OUTPUT_VARIABLE BOX2D_INCLUDE_DIR)
+
 cmake_path(APPEND ANDROID_NDK_THIRD_PARTY "sfml" "lib" ${CMAKE_ANDROID_ARCH_ABI} OUTPUT_VARIABLE SFML_LIB_DIR)
 cmake_path(APPEND ANDROID_NDK_THIRD_PARTY "sfml" "extlibs" "lib" ${CMAKE_ANDROID_ARCH_ABI} OUTPUT_VARIABLE SFML_EXTLIB_DIR)
 cmake_path(APPEND ANDROID_NDK_THIRD_PARTY "sfml" "include" OUTPUT_VARIABLE SFML_INCLUDE_DIR)
+
+message(STATUS "BOX2D_LIB_DIR: \"${BOX2D_LIB_DIR}\"")
+message(STATUS "BOX2D_INCLUDE_DIR: \"${BOX2D_INCLUDE_DIR}\"")
 
 message(STATUS "SFML_LIB_DIR: \"${SFML_LIB_DIR}\"")
 message(STATUS "SFML_EXTLIB_DIR: \"${SFML_EXTLIB_DIR}\"")
@@ -85,9 +94,24 @@ set_target_properties(openal PROPERTIES IMPORTED_IMPLIB_DEBUG "${SFML_EXTLIB_DIR
 set_target_properties(openal PROPERTIES IMPORTED_LOCATION_RELEASE "${SFML_EXTLIB_DIR}/libopenal.so")
 set_target_properties(openal PROPERTIES IMPORTED_IMPLIB_RELEASE "${SFML_EXTLIB_DIR}/libopenal.so")
 
+add_library(box2d::box2d SHARED IMPORTED)
+set_target_properties(box2d::box2d PROPERTIES IMPORTED_LOCATION_DEBUG "${BOX2D_LIB_DIR}/libbox2d.so")
+set_target_properties(box2d::box2d PROPERTIES IMPORTED_IMPLIB_DEBUG "${BOX2D_LIB_DIR}/libbox2d.so")
+set_target_properties(box2d::box2d PROPERTIES IMPORTED_LOCATION_RELEASE "${BOX2D_LIB_DIR}/libbox2d.so")
+set_target_properties(box2d::box2d PROPERTIES IMPORTED_IMPLIB_RELEASE "${BOX2D_LIB_DIR}/libbox2d.so")
+
 add_library(${PROJECT_TITLE} SHARED source/main.cpp)
 
-target_include_directories(${PROJECT_TITLE} PRIVATE ${SFML_INCLUDE_DIR})
-target_link_libraries(${PROJECT_TITLE} 
-android SFML::System SFML::Window SFML::Graphics SFML::Audio openal
--Wl,--whole-archive SFML::Main SFML::Activity -Wl,--no-whole-archive)
+target_include_directories(${PROJECT_TITLE} PRIVATE ${SFML_INCLUDE_DIR} ${BOX2D_INCLUDE_DIR})
+
+target_link_libraries(${PROJECT_TITLE}
+	android 
+	openal
+	box2d::box2d 
+	SFML::Activity
+	SFML::System
+	SFML::Window
+	SFML::Graphics 
+	SFML::Audio
+	-Wl,--whole-archive SFML::Main -Wl,--no-whole-archive
+)
