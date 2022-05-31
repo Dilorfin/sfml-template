@@ -15,7 +15,7 @@ option(BOX2D_ANDROID_PATH "Path to prebuild box2d binaries for Android")
 if(CMAKE_CONFIGURATION_TYPES)
 	set(CMAKE_CONFIGURATION_TYPES Debug Release)
 	set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Reset the configurations to what we need" FORCE)
-endif(CMAKE_CONFIGURATION_TYPES)
+endif()
 
 if(NOT DEFINED CMAKE_ANDROID_NDK)
 	if(DEFINED ENV{ANDROID_NDK_HOME})
@@ -112,3 +112,7 @@ target_link_libraries(${PROJECT_TITLE}
 	SFML::Audio
 	-Wl,--whole-archive SFML::Main -Wl,--no-whole-archive
 )
+
+set(OUTPUT_BINARY_FULLPATH "${CMAKE_BINARY_DIR}/lib${PROJECT_TITLE}.so")
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/android/app/src/main/jni/Android.mk.in"
+	"${CMAKE_CURRENT_SOURCE_DIR}/android/app/src/main/jni/Android.mk")

@@ -2,8 +2,8 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := native-lib-test
-LOCAL_SRC_FILES := @@
+LOCAL_MODULE := @PROJECT_TITLE@
+LOCAL_SRC_FILES := @OUTPUT_BINARY_FULLPATH@
 
 include $(PREBUILT_SHARED_LIBRARY)
 
@@ -11,7 +11,7 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE	:= sfml-example
 
-LOCAL_SHARED_LIBRARIES := native-lib-test
+LOCAL_SHARED_LIBRARIES := @PROJECT_TITLE@
 LOCAL_SHARED_LIBRARIES += sfml-system-d
 LOCAL_SHARED_LIBRARIES += sfml-window-d
 LOCAL_SHARED_LIBRARIES += sfml-graphics-d
