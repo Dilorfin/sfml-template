@@ -5,7 +5,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -61,16 +60,10 @@ jobs:
         gradle-version: 7.3.3
 
     - name: Gradle build
-      run: cd android && sudo gradle build
+      run: cd android && sudo gradle assembleDebug
 
     - name: Upload apk-debug
       uses: actions/upload-artifact@v2
       with:
         name: apk-debug
-        path: ./app/build/outputs/apk/debug/app-debug.apk
-
-    - name: Upload apk-debug
-      uses: actions/upload-artifact@v2
-      with:
-        name: apk-debug-1
         path: ./android/app/build/outputs/apk/debug/app-debug.apk
