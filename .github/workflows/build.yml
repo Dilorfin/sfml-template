@@ -23,7 +23,15 @@ jobs:
     - name: Configure cmake SFML
       run: cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_ANDROID_NDK=$ANDROID_NDK_LATEST_HOME -DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a -DCMAKE_ANDROID_STL_TYPE=c++_static -DCMAKE_BUILD_TYPE=Debug -B./SFML/.build ./SFML
 
+    - name: Cache SFML
+      id: sfml
+      uses: actions/cache@v2
+      with:
+        path: ./.SFML/.build
+        key: SFML-${{ matrix.platform.name }}-${{ matrix.build-type }}-${{ hashFiles('./.SFML/**/*.hpp') }}
+
     - name: Build SFML
+      if: steps.sfml.outputs.cache-hit != 'true'
       run: cmake --build ./SFML/.build --config=Debug
     
     - name: Install SFML
