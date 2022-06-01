@@ -19,10 +19,13 @@ jobs:
         path: './SFML'
 
     - name: Configure cmake SFML
-      run: cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_INSTALL_PREFIX=".libs-temp/sfml" -DCMAKE_ANDROID_NDK=$ANDROID_NDK_LATEST_HOME -DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a -DCMAKE_ANDROID_STL_TYPE=c++_static -DCMAKE_BUILD_TYPE=Debug -B./SFML/.build ./SFML
+      run: cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_ANDROID_NDK=$ANDROID_NDK_LATEST_HOME -DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a -DCMAKE_ANDROID_STL_TYPE=c++_static -DCMAKE_BUILD_TYPE=Debug -B./SFML/.build ./SFML
 
-    - name: Build & install SFML
-      run: cmake --build ./SFML/.build --config=Debug --target=install
+    - name: Build SFML
+      run: cmake --build ./SFML/.build --config=Debug
+    
+    - name: Install SFML
+      run: cmake --install ./SFML/.build --config=Debug --prefix="$ANDROID_NDK_LATEST_HOME/sources/third_party/sfml"
 
     - name: Checkout box2d
       uses: actions/checkout@v2
@@ -30,26 +33,41 @@ jobs:
         repository: 'erincatto/box2d'
         path: './box2d'
 
-      # path to box2d install ".libs-temp/box2d"
+    # path to box2d install "$ANDROID_NDK_LATEST_HOME/sources/third_party/box2d"
     - name: Configure cmake box2d
-      run: cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_INSTALL_PREFIX=".libs-temp/box2d" -DCMAKE_ANDROID_NDK=$ANDROID_NDK_LATEST_HOME -DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a -DCMAKE_ANDROID_STL_TYPE=c++_static -DCMAKE_BUILD_TYPE=Debug -B./box2d/.build ./box2d
+      run: cmake -DCMAKE_SYSTEM_NAME=Android -DBUILD_SHARED_LIBS=ON -DBOX2D_BUILD_TESTBED=OFF -DCMAKE_ANDROID_NDK=$ANDROID_NDK_LATEST_HOME -DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a -DCMAKE_ANDROID_STL_TYPE=c++_static -DCMAKE_BUILD_TYPE=Debug -B./box2d/.build ./box2d
 
-    - name: Build & install box2d
-      run: cmake --build ./box2d/.build --config=Debug --target=install
+    - name: Build box2d
+      run: cmake --build ./box2d/.build --config=Debug
+
+    - name: Install box2d
+      run: cmake --install ./box2d/.build --config=Debug --prefix="$ANDROID_NDK_LATEST_HOME/sources/third_party/box2d"
 
     - name: Copy box2d Android.mk
-      run: mkdir -p .libs-temp/box2d && cp android/hacks/box2d-android.mk .libs-temp/box2d/Android.mk
+      run: cp android/hacks/box2d-android.mk $ANDROID_NDK_LATEST_HOME/sources/third_party/box2d/Android.mk
+
+    - name: Configure cmake current project
+      run: cmake -DCMAKE_SYSTEM_NAME=Android -DCMAKE_ANDROID_NDK=$ANDROID_NDK_LATEST_HOME -DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a -DCMAKE_ANDROID_STL_TYPE=c++_static -DCMAKE_BUILD_TYPE=Debug -B./.build .
+
+    - name: Build current project
+      run: cmake --build ./.build --config=Debug
 
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
       with:
-        gradle-version: 7.2.1
+        gradle-version: 7.3.3
 
     - name: Gradle build
-      run: gradle build
+      run: cd android && sudo gradle build
 
     - name: Upload apk-debug
       uses: actions/upload-artifact@v2
       with:
         name: apk-debug
         path: ./app/build/outputs/apk/debug/app-debug.apk
+
+    - name: Upload apk-debug
+      uses: actions/upload-artifact@v2
+      with:
+        name: apk-debug-1
+        path: ./android/app/build/outputs/apk/debug/app-debug.apk

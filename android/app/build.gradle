@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
+	ndkVersion '23.1.7779620'
     defaultConfig {
         applicationId "org.sfmldev.android"
         minSdkVersion 20
@@ -29,10 +30,9 @@ android {
             path "src/main/jni/Android.mk"
         }
     }
-}
-
-android {
-	ndkVersion '23.1.7779620'
+	lintOptions {
+		disable 'ExpiredTargetSdkVersion'
+	}
 }
 
 dependencies {
