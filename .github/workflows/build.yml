@@ -25,10 +25,10 @@ jobs:
 
     - name: Cache SFML
       id: sfml
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
-        path: ./.SFML/.build
-        key: SFML-${{ matrix.platform.name }}-${{ matrix.build-type }}-${{ hashFiles('./.SFML/**/*.hpp') }}
+        path: ./SFML/.build
+        key: SFML-${{ hashFiles('./SFML/**/*.hpp') }}
 
     - name: Build SFML
       if: steps.sfml.outputs.cache-hit != 'true'
