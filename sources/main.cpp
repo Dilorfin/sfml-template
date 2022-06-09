@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     window.setFramerateLimit(30);
 
     sf::Texture texture;
-    if(!texture.loadFromFile("image.png"))
+    if(!texture.loadFromFile("assets/image.png"))
         return EXIT_FAILURE;
 
     sf::Sprite image(texture);
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     image.setOrigin({texture.getSize().x / 2.f, texture.getSize().y / 2.f});
 
     sf::Font font;
-    if (!font.loadFromFile("tuffy.ttf"))
+    if (!font.loadFromFile("assets/tuffy.ttf"))
         return EXIT_FAILURE;
 
     sf::Text text("Tap anywhere to move the logo.", font, 64);
