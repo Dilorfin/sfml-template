@@ -15,7 +15,8 @@ option(BUILD_BENCHMARKS "Building benhmarks require nanobench library" OFF)
 option(COPY_ASSETS "Copy assets (have different behavior for android)" ON)
 option(COPY_SFML_DLLS "For windows only, copy dlls from SFML_DIR/bin and error not found" ON)
 
-#set(ANDROID_APPLICATION_ID "org.sfmldev.android")
+#option(ANDROID_PACKAGE_NAME "A valid Java identifier for APK package" )
+set(ANDROID_PACKAGE_NAME "org.dilorfin.template")
 option(SFML_ANDROID_PATH "Path to prebuild SFML binaries for Android")
 option(BOX2D_ANDROID_PATH "Path to prebuild box2d binaries for Android")
 

@@ -117,3 +117,6 @@ set(OUTPUT_BINARY_FULLPATH "${CMAKE_CURRENT_BINARY_DIR}/lib${PROJECT_TITLE}.so")
 message(STATUS "OUTPUT_BINARY_FULLPATH: ${OUTPUT_BINARY_FULLPATH}")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/app/src/main/jni/Android.mk.in"
 	"${CMAKE_CURRENT_SOURCE_DIR}/app/src/main/jni/Android.mk")
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/app/src/main/AndroidManifest.xml.in"
+	"${CMAKE_CURRENT_SOURCE_DIR}/app/src/main/AndroidManifest.xml")
