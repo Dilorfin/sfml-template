@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 project("Native test library" VERSION 0.1 LANGUAGES CXX)
 
-#set(PROJECT_VERSION_MINOR )
-message("PROJECT_VERSION_MINOR: ${PROJECT_VERSION_MINOR}")
 string(TOLOWER ${CMAKE_PROJECT_NAME} PROJECT_TITLE)
 string(REGEX REPLACE "[ \t\r\n]" "-" PROJECT_TITLE ${PROJECT_TITLE})
 message(VERBOSE "PROJECT_TITLE: ${PROJECT_TITLE}")
@@ -30,14 +28,8 @@ elseif(NOT (${CMAKE_BUILD_TYPE} STREQUAL "Debug" OR ${CMAKE_BUILD_TYPE} STREQUAL
 endif()
 
 cmake_path(APPEND CMAKE_SOURCE_DIR "assets" OUTPUT_VARIABLE ASSETS_DIR)
-add_compile_definitions(TEST="${CMAKE_SOURCE_DIR}")
-add_compile_definitions(TEST_JUST_DEFINE)
 
-file(
-	GLOB_RECURSE SOURCE_LIST
-	"sources/*.[hc]pp"
-	"sources/*.[hc]"
-)
+add_subdirectory(sources)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
 	add_subdirectory(android)
@@ -47,9 +39,6 @@ endif()
 find_package(SFML 3 COMPONENTS System Window Graphics REQUIRED) # graphics audio network system window
 find_package(box2d REQUIRED)
 message(STATUS "Found box2d in ${box2d_DIR}")
-
-## should be in "source" dir and also be for android
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(GENERAL_DEPENDENCIES box2d::box2d SFML::System SFML::Window SFML::Graphics) # SFML::<component>
 
