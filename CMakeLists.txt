@@ -32,8 +32,15 @@ cmake_path(APPEND CMAKE_SOURCE_DIR "assets" OUTPUT_VARIABLE ASSETS_DIR)
 add_subdirectory(sources)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
+	add_compile_definitions(ANDROID_OS)
 	add_subdirectory(android)
 	return()
+endif()
+
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+	add_compile_definitions(WINDOWS_OS)
+else()
+	add_compile_definitions(LINUX_OS)
 endif()
 
 find_package(SFML 3 COMPONENTS System Window Graphics REQUIRED) # graphics audio network system window

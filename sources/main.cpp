@@ -22,6 +22,17 @@ int main(int argc, char *argv[])
     if(!texture.loadFromFile("assets/image.png"))
         return EXIT_FAILURE;
 
+	std::string textData = "undefined";
+#ifdef ANDROID_OS
+	textData = "android";
+#else
+#ifdef WINDOWS_OS
+	textData = "windows";
+#else
+	textData = "linux";
+#endif
+#endif
+
     sf::Sprite image(texture);
 
     image.setPosition({screen.size.x / 2.f, screen.size.y / 2.f});
@@ -31,7 +42,7 @@ int main(int argc, char *argv[])
     if (!font.loadFromFile("assets/tuffy.ttf"))
         return EXIT_FAILURE;
 
-    sf::Text text("Tap anywhere to move the logo.", font, 64);
+    sf::Text text(textData, font, 64);
     text.setFillColor(sf::Color::Black);
     text.setPosition({10, 10});
 
