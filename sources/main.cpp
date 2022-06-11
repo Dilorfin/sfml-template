@@ -25,12 +25,11 @@ int main(int argc, char *argv[])
 	std::string textData = "undefined";
 #ifdef ANDROID_OS
 	textData = "android";
-#else
+#endif
 #ifdef WINDOWS_OS
 	textData = "windows";
 #else
 	textData = "linux";
-#endif
 #endif
 
     sf::Sprite image(texture);
