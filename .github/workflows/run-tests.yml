@@ -1,0 +1,143 @@
+name: Run tests
+
+on:
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.platform.name }}-${{ matrix.build-type }}
+    runs-on: ${{ matrix.platform.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: 
+        - { 
+            name: 'Windows VS17',
+            os: windows-2022,
+            cmake-sfml: '-G"Visual Studio 17"',
+            cmake-flags: '-G"Visual Studio 17"'
+          }
+        - { 
+            name: 'Windows CLang',
+            os: windows-2022,
+            cmake-sfml: '-G"Visual Studio 17"',
+            cmake-flags: '-GNinja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
+          }
+        - { 
+            name: 'Windows CLang-CL',
+            os: windows-2022,
+            cmake-sfml: '-G"Visual Studio 17"',
+            cmake-flags: '-GNinja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl'
+          }
+        - {
+            name: 'Linux GCC',
+            os: ubuntu-20.04
+          } 
+        - {
+            name: 'Linux CLang',
+            os: ubuntu-20.04,
+            cmake-sfml: '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++',
+            cmake-flags: '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
+          } 
+        - {
+            name: 'MacOS',
+            os: macos-latest
+          }
+        build-type: [Debug, Release]
+
+    steps:
+    - name: Checkout current repo
+      uses: actions/checkout@v2
+
+    - name: Setup Ninja
+      if: runner.os == 'Windows' && matrix.platform.name != 'Windows VS17'
+      uses: ashutoshvarma/setup-ninja@master
+
+    - name: Set up Visual Studio shell
+      if: matrix.platform.name == 'Windows CLang-CL'
+      uses: egor-tensin/vs-shell@v2
+
+    - name: Install Linux Dependencies
+      if: runner.os == 'Linux'
+      run: sudo apt-get update && sudo apt-get install libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
+
+    - name: Checkout SFML
+      uses: actions/checkout@v2
+      with:
+        repository: 'SFML/SFML'
+        path: './.SFML'
+
+    - name: Cache SFML
+      id: sfml
+      uses: actions/cache@v2
+      with:
+        path: ./.SFML/.build
+        key: SFML-${{ matrix.platform.name }}-${{ matrix.build-type }}-${{ hashFiles('./.SFML/**/*.hpp') }}
+
+    - name: Configure cmake SFML
+      if: steps.sfml.outputs.cache-hit != 'true'
+      run: cmake ${{ matrix.platform.cmake-sfml }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -B./.SFML/.build ./.SFML
+
+    - name: Build SFML
+      if: steps.sfml.outputs.cache-hit != 'true'
+      run: cmake --build ./.SFML/.build --config=${{ matrix.build-type }}
+
+    - name: Install SFML
+      run: ${{ runner.os!='Windows'&&'sudo '||''}}cmake --install ./.SFML/.build --config=${{ matrix.build-type }}
+
+    - name: Checkout Box2D
+      uses: actions/checkout@v2
+      with:
+        repository: 'erincatto/box2d'
+        path: './.box2d'
+
+    - name: Cache Box2D
+      id: box2d
+      uses: actions/cache@v2
+      with:
+        path: ./.box2d/.build
+        key: Box2D-${{ matrix.platform.name }}-${{ matrix.build-type }}-${{ hashFiles('./.box2d/**/*.h') }}
+ 
+    - name: Configure cmake Box2D
+      if: steps.box2d.outputs.cache-hit != 'true'
+      run: cmake ${{ matrix.platform.cmake-flags }} -DBOX2D_BUILD_TESTBED=OFF -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -B./.box2d/.build ./.box2d
+
+    - name: Build Box2D
+      if: steps.box2d.outputs.cache-hit != 'true'
+      run: cmake --build ./.box2d/.build --config=${{ matrix.build-type }}
+
+    - name: Install Box2D
+      run: ${{ runner.os!='Windows'&&'sudo '||''}}cmake --install ./.box2d/.build --config=${{ matrix.build-type }}
+
+    - name: Checkout doctest
+      uses: actions/checkout@v2
+      with:
+        repository: 'doctest/doctest'
+        path: './.doctest'
+
+    - name: Configure cmake doctest
+      run: cmake ${{ matrix.platform.cmake-flags }} -DDOCTEST_WITH_TESTS=OFF -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -B./.doctest/.build ./.doctest
+
+    - name: Build doctest
+      run: cmake --build ./.doctest/.build
+
+    - name: Install doctest
+      run: ${{ runner.os!='Windows'&&'sudo '||''}}cmake --install ./.doctest/.build --config=${{ matrix.build-type }}
+ 
+    - name: Configure Project
+      run: cmake ${{ matrix.platform.cmake-flags }} -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -B./.build .
+
+    - name: Copy dll-s
+      if: runner.os == 'Windows'
+      run: find -name "*.dll" -exec cp {} ./.build \;
+      shell: bash
+
+    - name: Build Project
+      run: cmake --build ./.build --config=${{ matrix.build-type }}
+
+    - name: Run Tests
+      if: runner.os != 'macOS' && matrix.platform.name != 'Linux GCC'
+      run: ctest -C ${{ matrix.build-type }} --output-on-failure --no-tests=error --test-dir .build
