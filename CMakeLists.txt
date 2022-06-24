@@ -23,9 +23,9 @@ option(BOX2D_ANDROID_PATH "Path to prebuild box2d binaries for Android")
 if(CMAKE_CONFIGURATION_TYPES)
 	set(CMAKE_CONFIGURATION_TYPES Debug Release)
 	set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING "Reset the configurations to what we need" FORCE)
-#TODO: better config for single build configuration generators
-elseif(NOT (${CMAKE_BUILD_TYPE} STREQUAL "Debug" OR ${CMAKE_BUILD_TYPE} STREQUAL "Release"))
-	message(FATAL_ERROR "CMAKE_BUILD_TYPE must be Debug or Release, now it's ${CMAKE_BUILD_TYPE}")
+elseif(NOT (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "Release"))
+	message(STATUS "CMAKE_BUILD_TYPE was \"${CMAKE_BUILD_TYPE}\", setting \"Debug\" value")
+	set(CMAKE_BUILD_TYPE "Debug")
 endif()
 
 cmake_path(APPEND CMAKE_SOURCE_DIR "assets" OUTPUT_VARIABLE ASSETS_DIR)
