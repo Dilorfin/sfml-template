@@ -11,7 +11,7 @@ jobs:
     name: ${{ matrix.platform.name }}-${{ matrix.build-type }}
     runs-on: ${{ matrix.platform.os }}
     strategy:
-      fail-fast: false
+      #fail-fast: false
       matrix:
         platform: 
         - { 
@@ -33,8 +33,9 @@ jobs:
             cmake-flags: '-GNinja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl'
           }
         - {
-            name: 'Linux GCC',
-            os: ubuntu-20.04
+            name: 'Linux GCC (no-tests)',
+            os: ubuntu-20.04,
+            no-tests: true
           } 
         - {
             name: 'Linux CLang',
@@ -43,8 +44,9 @@ jobs:
             cmake-flags: '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
           } 
         - {
-            name: 'MacOS',
-            os: macos-latest
+            name: 'MacOS (no-tests)',
+            os: macos-latest,
+            no-tests: true
           }
         build-type: [Debug, Release]
 
@@ -130,14 +132,13 @@ jobs:
     - name: Configure Project
       run: cmake ${{ matrix.platform.cmake-flags }} -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -B./.build .
 
-    - name: Copy dll-s
-      if: runner.os == 'Windows'
-      run: find -name "*.dll" -exec cp {} ./.build \;
-      shell: bash
-
     - name: Build Project
       run: cmake --build ./.build --config=${{ matrix.build-type }}
 
+    - name: Test
+      run: cd /.SFML/.build && ls
+      shell: bash
+
     - name: Run Tests
-      if: runner.os != 'macOS' && matrix.platform.name != 'Linux GCC'
+      #if: matrix.platform.no-tests != true
       run: ctest -C ${{ matrix.build-type }} --output-on-failure --no-tests=error --test-dir .build
