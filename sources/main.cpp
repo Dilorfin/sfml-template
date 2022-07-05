@@ -13,14 +13,14 @@ void CreateCircle(b2World* world, int MouseX, int MouseY);
 
 int main(int argc, char *argv[])
 {
-    sf::VideoMode screen(sf::VideoMode::getDesktopMode());
+	sf::VideoMode screen(sf::VideoMode::getDesktopMode());
 
-    sf::RenderWindow window(screen, "");
-    window.setFramerateLimit(30);
+	sf::RenderWindow window(screen, "");
+	window.setFramerateLimit(30);
 
-    sf::Texture texture;
-    if(!texture.loadFromFile("assets/image.png"))
-        return EXIT_FAILURE;
+	sf::Texture texture;
+	if(!texture.loadFromFile("assets/image.png"))
+		return EXIT_FAILURE;
 
 	std::string textData = "undefined";
 #ifdef ANDROID_OS
@@ -32,18 +32,18 @@ int main(int argc, char *argv[])
 	textData = "linux";
 #endif
 
-    sf::Sprite image(texture);
+	sf::Sprite image(texture);
 
-    image.setPosition({screen.size.x / 2.f, screen.size.y / 2.f});
-    image.setOrigin({texture.getSize().x / 2.f, texture.getSize().y / 2.f});
+	image.setPosition({screen.size.x / 2.f, screen.size.y / 2.f});
+	image.setOrigin({texture.getSize().x / 2.f, texture.getSize().y / 2.f});
 
-    sf::Font font;
-    if (!font.loadFromFile("assets/tuffy.ttf"))
-        return EXIT_FAILURE;
+	sf::Font font;
+	if (!font.loadFromFile("assets/tuffy.ttf"))
+		return EXIT_FAILURE;
 
-    sf::Text text(textData, font, 64);
-    text.setFillColor(sf::Color::Black);
-    text.setPosition({10, 10});
+	sf::Text text(textData, font, 64);
+	text.setFillColor(sf::Color::Black);
+	text.setPosition({10, 10});
 
 	b2Vec2 gravity(0.f, 9.8f);
 	b2World* world = new b2World(gravity);
@@ -56,73 +56,73 @@ int main(int argc, char *argv[])
 	CreateBox(world, 15, 15);
 	CreateCircle(world, 100, 100);
 
-    sf::View view = window.getDefaultView();
+	sf::View view = window.getDefaultView();
 
-    sf::Color background = sf::Color::White;
+	sf::Color background = sf::Color::White;
 
-    // We shouldn't try drawing to the screen while in background
-    // so we'll have to track that. You can do minor background
-    // work, but keep battery life in mind.
-    bool active = true;
+	// We shouldn't try drawing to the screen while in background
+	// so we'll have to track that. You can do minor background
+	// work, but keep battery life in mind.
+	bool active = true;
 
-    while (window.isOpen())
-    {
-        sf::Event event;
+	while (window.isOpen())
+	{
+		sf::Event event;
 
-        while (active ? window.pollEvent(event) : window.waitEvent(event))
-        {
-            switch (event.type)
-            {
-                case sf::Event::Closed:
-                    window.close();
-                    break;
-                case sf::Event::KeyPressed:
-                    if (event.key.code == sf::Keyboard::Escape)
-                        window.close();
-                    break;
-                case sf::Event::Resized:
-                    view.setSize(sf::Vector2f(event.size.width, event.size.height));
-                    view.setCenter(sf::Vector2f(event.size.width / 2.f, event.size.height / 2.f));
-                    window.setView(view);
-                    break;
-                case sf::Event::LostFocus:
-                    background = sf::Color::Black;
-                    break;
-                case sf::Event::GainedFocus:
-                    background = sf::Color::White;
-                    break;
+		while (active ? window.pollEvent(event) : window.waitEvent(event))
+		{
+			switch (event.type)
+			{
+				case sf::Event::Closed:
+					window.close();
+					break;
+				case sf::Event::KeyPressed:
+					if (event.key.code == sf::Keyboard::Escape)
+						window.close();
+					break;
+				case sf::Event::Resized:
+					view.setSize(sf::Vector2f(event.size.width, event.size.height));
+					view.setCenter(sf::Vector2f(event.size.width / 2.f, event.size.height / 2.f));
+					window.setView(view);
+					break;
+				case sf::Event::LostFocus:
+					background = sf::Color::Black;
+					break;
+				case sf::Event::GainedFocus:
+					background = sf::Color::White;
+					break;
 
-                // On Android MouseLeft/MouseEntered are (for now) triggered,
-                // whenever the app loses or gains focus.
-                case sf::Event::MouseLeft:
-                    active = false;
-                    break;
-                case sf::Event::MouseEntered:
-                    active = true;
-                    break;
-                case sf::Event::TouchBegan:
-                    if (event.touch.finger == 0)
-                    {
-                        image.setPosition(sf::Vector2f(static_cast<float>(event.touch.x), static_cast<float>(event.touch.y)));
-                    }
-                    break;
-            }
-        }
+				// On Android MouseLeft/MouseEntered are (for now) triggered,
+				// whenever the app loses or gains focus.
+				case sf::Event::MouseLeft:
+					active = false;
+					break;
+				case sf::Event::MouseEntered:
+					active = true;
+					break;
+				case sf::Event::TouchBegan:
+					if (event.touch.finger == 0)
+					{
+						image.setPosition(sf::Vector2f(static_cast<float>(event.touch.x), static_cast<float>(event.touch.y)));
+					}
+					break;
+			}
+		}
 
 		world->Step(1 / 60.f, 8, 3);
 
-        if (active)
-        {
-            window.clear(background);
-            window.draw(image);
-            window.draw(text);
+		if (active)
+		{
+			window.clear(background);
+			window.draw(image);
+			window.draw(text);
 			world->DebugDraw();
-            window.display();
-        }
-        else {
-            sf::sleep(sf::milliseconds(100));
-        }
-    }
+			window.display();
+		}
+		else {
+			sf::sleep(sf::milliseconds(100));
+		}
+	}
 }
 
 void CreateCircle(b2World* world, int MouseX, int MouseY)
