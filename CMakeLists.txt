@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project("Native test library" VERSION 0.1 LANGUAGES CXX)
+project("SFML Template" VERSION 0.1 LANGUAGES CXX)
 
 string(TOLOWER ${CMAKE_PROJECT_NAME} PROJECT_TITLE)
 string(REGEX REPLACE "[ \t\r\n]" "-" PROJECT_TITLE ${PROJECT_TITLE})
