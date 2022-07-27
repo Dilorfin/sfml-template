@@ -136,5 +136,5 @@ jobs:
       run: cmake --build ./.build --config=${{ matrix.build-type }}
 
     - name: Run Tests
-      #if: matrix.platform.no-tests != true
+      if: matrix.platform.no-tests != true
       run: ctest -C ${{ matrix.build-type }} --output-on-failure --no-tests=error --test-dir .build
