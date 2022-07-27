@@ -8,13 +8,19 @@ on:
 
 jobs:
   clang-format:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout current repo
       uses: actions/checkout@v2
+
+    - name: Update clang-format package
+      run: sudo apt search clang-format
+
+    - name: Update clang-format package
+      run: sudo apt-get install clang-format
 
     - name: Check clang-format version
       run: clang-format --version
 
     - name: Run clang-format
-      run: find . -name "*.cpp" -o -name "*.c" -o -name "*.h" -o -name "*.hpp" | xargs -I {} clang-format -i {} -n --verbose --Werror
+      run: find . -name "*.cpp" -o -name "*.hpp" -o -name "*.c" -o -name "*.h" | xargs -I {} clang-format -i {} -n --verbose --Werror
