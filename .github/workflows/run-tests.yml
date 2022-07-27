@@ -135,10 +135,6 @@ jobs:
     - name: Build Project
       run: cmake --build ./.build --config=${{ matrix.build-type }}
 
-    - name: Test
-      run: cd /.SFML/.build && ls
-      shell: bash
-
     - name: Run Tests
       #if: matrix.platform.no-tests != true
       run: ctest -C ${{ matrix.build-type }} --output-on-failure --no-tests=error --test-dir .build
