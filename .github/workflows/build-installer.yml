@@ -1,0 +1,72 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout current repo
+      uses: actions/checkout@v2
+
+    - name: Checkout SFML
+      uses: actions/checkout@v2
+      with:
+        repository: 'SFML/SFML'
+        path: './.SFML'
+
+    - name: Cache SFML
+      id: sfml
+      uses: actions/cache@v2
+      with:
+        path: ./.SFML/.build
+        key: SFML-${{ matrix.platform.name }}-${{ matrix.build-type }}-${{ hashFiles('./.SFML/**/*.hpp') }}
+
+    - name: Configure cmake SFML
+      if: steps.sfml.outputs.cache-hit != 'true'
+      run: cmake ${{ matrix.platform.cmake-sfml }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -B./.SFML/.build ./.SFML
+
+    - name: Build SFML
+      if: steps.sfml.outputs.cache-hit != 'true'
+      run: cmake --build ./.SFML/.build --config=${{ matrix.build-type }}
+
+    - name: Install SFML
+      run: ${{ runner.os!='Windows'&&'sudo '||''}}cmake --install ./.SFML/.build --config=${{ matrix.build-type }}
+
+    - name: Checkout Box2D
+      uses: actions/checkout@v2
+      with:
+        repository: 'erincatto/box2d'
+        path: './.box2d'
+
+    - name: Cache Box2D
+      id: box2d
+      uses: actions/cache@v2
+      with:
+        path: ./.box2d/.build
+        key: Box2D-${{ matrix.platform.name }}-${{ matrix.build-type }}-${{ hashFiles('./.box2d/**/*.h') }}
+ 
+    - name: Configure cmake Box2D
+      if: steps.box2d.outputs.cache-hit != 'true'
+      run: cmake ${{ matrix.platform.cmake-flags }} -DBOX2D_BUILD_TESTBED=OFF -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -B./.box2d/.build ./.box2d
+
+    - name: Build Box2D
+      if: steps.box2d.outputs.cache-hit != 'true'
+      run: cmake --build ./.box2d/.build --config=${{ matrix.build-type }}
+
+    - name: Install Box2D
+      run: ${{ runner.os!='Windows'&&'sudo '||''}}cmake --install ./.box2d/.build --config=${{ matrix.build-type }}
+
+    - name: Configure current Project
+      run: cmake ${{ matrix.platform.cmake-flags }} -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -B./.build .
+
+    - name: Build current Project
+      run: cmake --build ./.build --config=Debug
+
+    - name: Upload apk-debug
+      uses: actions/upload-artifact@v2
+      with:
+        name: apk-debug
+        path: ./android/app/build/outputs/apk/debug/app-debug.apk
