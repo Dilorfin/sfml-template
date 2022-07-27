@@ -10,9 +10,10 @@ class DebugDraw final : public b2Draw
 {
 private:
 	sf::RenderTarget& renderTarget;
+
 public:
 	explicit DebugDraw(sf::RenderTarget& renderTarget)
-		:renderTarget(renderTarget)
+		: renderTarget(renderTarget)
 	{}
 
 	void DrawPolygon(const b2Vec2* vertices, int32 vertexCount, const b2Color& color) override
@@ -43,7 +44,7 @@ public:
 	{
 		const float r = metersToPixels(radius);
 		sf::CircleShape circle(r);
-		circle.setOrigin({r, r});
+		circle.setOrigin({ r, r });
 		circle.setPosition(convert(center));
 		circle.setOutlineThickness(2);
 		circle.setOutlineColor(convert(color));
@@ -53,7 +54,7 @@ public:
 	{
 		const float r = metersToPixels(radius);
 		sf::CircleShape circle(r);
-		circle.setOrigin({r, r});
+		circle.setOrigin({ r, r });
 		circle.setPosition(convert(center));
 		circle.setFillColor(convert(color));
 		renderTarget.draw(circle);
@@ -72,7 +73,7 @@ public:
 	{
 		const float r = metersToPixels(size);
 		sf::CircleShape circle(r);
-		circle.setOrigin({r / 2.f, r / 2.f});
+		circle.setOrigin({ r / 2.f, r / 2.f });
 		circle.setPosition(convert(p));
 		circle.setFillColor(convert(color));
 		renderTarget.draw(circle);
@@ -84,21 +85,13 @@ public:
 private:
 	static sf::Vector2f convert(const b2Vec2& p)
 	{
-		return {
-			metersToPixels(p.x),
-			metersToPixels(p.y)
-		};
+		return { metersToPixels(p.x), metersToPixels(p.y) };
 	}
 	static sf::Color convert(const b2Color& color)
 	{
-		auto c = [](const float v)->sf::Uint8 {
+		auto c = [](const float v) -> sf::Uint8 {
 			return static_cast<sf::Uint8>(std::floor(v >= 1.0f ? 255 : v * 256.0f));
 		};
-		return {
-			c(color.r),
-			c(color.g),
-			c(color.b),
-			c(color.a)
-		};
+		return { c(color.r), c(color.g), c(color.b), c(color.a) };
 	}
 };
