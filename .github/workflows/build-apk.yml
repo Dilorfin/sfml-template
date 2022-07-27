@@ -18,8 +18,8 @@ jobs:
         path: './SFML'
 
     # sfml-android-fix.patch -- finish working on each new SFML commit
-    - name: Apply workaround with ANativeActivity_onCreate
-      run: cd SFML && git apply ../android/hacks/sfml-android-fix.patch
+    #- name: Apply workaround with ANativeActivity_onCreate
+    #  run: cd SFML && git apply ../android/hacks/sfml-android-fix.patch
 
     # in case of unexpected fail github actions ndk version should be checked
     - name: Configure cmake SFML
