@@ -72,7 +72,7 @@ endif()
 if(COPY_ASSETS)
 	message(VERBOSE "ASSETS_DIR: ${ASSETS_DIR}")
 	message(VERBOSE "ASSETS_DEST_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
-	
+
 	file(COPY ${ASSETS_DIR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
@@ -81,14 +81,30 @@ if(COPY_SFML_DLLS AND ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 	if(NOT EXISTS ${SFML_DLLS_DIR})
 		message(STATUS "can't copy sfml dlls, ${SFML_DLLS_DIR} does not exists")
 	else()
-		file(GLOB_RECURSE SFML_DLLS "${SFML_DLLS_DIR}/*.dll")
+		#TODO: Move SFML_DLLS_LIST to outer scope for install purpose
+		file(GLOB_RECURSE SFML_DLLS_LIST "${SFML_DLLS_DIR}/*.dll")
 		
 		message(VERBOSE "SFML_DLLS_DIR: ${SFML_DLLS_DIR}")
-		message(DEBUG "SFML_DLLS: ${SFML_DLLS}")
+		message(DEBUG "SFML_DLLS_LIST: ${SFML_DLLS_LIST}")
 
-		file(COPY ${SFML_DLLS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+		file(COPY ${SFML_DLLS_LIST} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 	endif()
 endif()
+
+install(TARGETS ${PROJECT_TITLE}
+	DESTINATION .
+)
+#TODO: add only on windows
+install(FILES ${SFML_DLLS_LIST}
+	DESTINATION .
+)
+install(DIRECTORY ${ASSETS_DIR}
+	DESTINATION .
+)
+
+include(InstallRequiredSystemLibraries)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+include(CPack)
 
 # Prettify IDEs Projects
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
